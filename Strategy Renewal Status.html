@@ -1,0 +1,504 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Strategy Renewal Status</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: deadline band -> figure row -> partner load chart -> chase list -> filtered roster -> next month */
+:root{
+  --page:#f7f7f4; --surface:#fcfcfb; --sunken:#f0efec;
+  --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --rule:#c3c2b7; --ring:rgba(11,11,11,.10);
+  --accent:#2a78d6; --accent-soft:rgba(42,120,214,.10);
+  --good:#0ca30c; --warning:#fab219; --serious:#ec835a; --critical:#d03b3b; --none:#898781;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --page:#0d0d0d; --surface:#1a1a19; --sunken:#232322;
+  --ink:#fff; --ink2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --rule:#383835; --ring:rgba(255,255,255,.10);
+  --accent:#3987e5; --accent-soft:rgba(57,135,229,.16);
+  --good:#0ca30c; --warning:#fab219; --serious:#ec835a; --critical:#d03b3b; --none:#898781;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --page:#0d0d0d; --surface:#1a1a19; --sunken:#232322;
+  --ink:#fff; --ink2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --rule:#383835; --ring:rgba(255,255,255,.10);
+  --accent:#3987e5; --accent-soft:rgba(57,135,229,.16);
+  --good:#0ca30c; --warning:#fab219; --serious:#ec835a; --critical:#d03b3b; --none:#898781;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--page);color:var(--ink);font-family:var(--sans);line-height:1.45;margin:0}
+.wrap{max-width:1600px;margin:0 auto;padding-inline:16px;padding-block:28px 56px}
+@media(min-width:1100px){.wrap{padding-inline:32px}}
+h1,h2,h3{text-wrap:balance;margin:0}
+a{color:var(--accent)}
+
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:clamp(26px,4.4vw,36px);font-weight:600;letter-spacing:-.02em;margin-top:6px}
+.lede{color:var(--ink2);font-size:14px;max-width:68ch;margin-top:8px}
+.stamp{color:var(--muted);font-size:12px;margin-top:10px}
+.stamp b{color:var(--ink2);font-weight:500}
+
+/* deadline band */
+.band{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 18px;
+  margin-top:24px;padding:16px 18px;background:var(--surface);
+  border:1px solid var(--ring);border-left:3px solid var(--critical);border-radius:3px}
+.band .hero{font-size:clamp(40px,7vw,56px);font-weight:600;letter-spacing:-.03em;line-height:1}
+.band .heroLabel{font-size:14px;color:var(--ink2);max-width:34ch}
+.band .cd{margin-left:auto;text-align:right}
+.band .cdNum{font-family:var(--mono);font-size:22px;font-weight:500}
+.band .cdLab{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+h2{font-size:15px;font-weight:600;letter-spacing:-.01em;margin-top:40px;
+  padding-bottom:8px;border-bottom:1px solid var(--grid)}
+h2 .n{color:var(--muted);font-weight:400;font-family:var(--mono);font-size:13px;margin-left:8px}
+.note{font-size:13px;color:var(--ink2);margin-top:10px;max-width:72ch}
+
+/* stat tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(142px,1fr));gap:10px;margin-top:16px}
+.tile{background:var(--surface);border:1px solid var(--ring);border-radius:3px;padding:12px 14px;min-width:0}
+.tile .lab{font-size:12px;color:var(--ink2);display:flex;align-items:center;gap:6px}
+.tile .val{font-size:27px;font-weight:600;letter-spacing:-.02em;margin-top:6px;line-height:1}
+.tile .sub{font-size:11px;color:var(--muted);margin-top:4px;font-family:var(--mono)}
+.sw{width:10px;height:10px;border-radius:2px;flex:0 0 auto;display:inline-block}
+
+/* partner load chart */
+.chart{margin-top:16px;background:var(--surface);border:1px solid var(--ring);border-radius:3px;padding:16px 18px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-bottom:16px}
+.legend span{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2)}
+.prow{display:grid;grid-template-columns:150px 1fr 42px;align-items:center;gap:12px;margin-bottom:9px}
+.prow .pname{font-size:12.5px;color:var(--ink2);text-align:right;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pbar{display:flex;gap:2px;height:20px;min-width:0}
+.pbar i{display:block;height:100%;border-radius:0;cursor:default}
+.pbar i:first-child{border-radius:2px 0 0 2px}
+.pbar i:last-child{border-radius:0 2px 2px 0}
+.prow .ptot{font-family:var(--mono);font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
+@media (max-width:560px){.prow{grid-template-columns:104px 1fr 34px;gap:8px}}
+@media (min-width:1100px){.prow{grid-template-columns:190px 1fr 48px;margin-bottom:11px}.pbar{height:24px}}
+
+/* filters */
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;align-items:center}
+.filters select,.filters input[type=search]{font-family:var(--sans);font-size:13px;color:var(--ink);
+  background:var(--surface);border:1px solid var(--rule);border-radius:3px;padding:7px 9px;min-width:0}
+.filters input[type=search]{flex:1 1 180px}
+.chk{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink2);
+  background:var(--surface);border:1px solid var(--rule);border-radius:3px;padding:6px 10px;cursor:pointer}
+.chk input{accent-color:var(--accent);margin:0}
+
+/* tables */
+.scroll{overflow:auto;margin-top:12px;border:1px solid var(--ring);border-radius:3px;background:var(--surface)}
+@media(min-width:900px){.tall{max-height:72vh}}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:13px}
+th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--rule);white-space:nowrap;
+  background:var(--surface);position:sticky;top:0;z-index:2}
+td{padding:10px 12px;border-bottom:1px solid var(--grid);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.acct{font-weight:500;display:block}
+.acct .esc{color:var(--critical);font-weight:600;font-size:11px;letter-spacing:.04em;margin-right:5px}
+.sub2{color:var(--muted);font-size:11.5px;font-family:var(--mono);display:block;margin-top:2px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2);white-space:nowrap}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.late{color:var(--critical);font-weight:600}
+.soon{color:var(--serious);font-weight:600}
+td.notes{min-width:200px}
+@media(min-width:1100px){td.notes{width:32%}td.notes textarea{min-height:40px}
+  td:last-child,th:last-child{width:1%;white-space:nowrap}}
+td.notes textarea{width:100%;min-height:34px;font-family:var(--sans);font-size:12.5px;color:var(--ink);
+  background:var(--sunken);border:1px solid transparent;border-radius:3px;padding:6px 7px;resize:vertical}
+td.notes textarea:hover{border-color:var(--rule)}
+td.notes textarea:focus{border-color:var(--accent);background:var(--surface);outline:none}
+td.notes .ro{font-size:12.5px;color:var(--ink2);white-space:pre-wrap}
+td.notes .by{font-size:10.5px;color:var(--muted);margin-top:3px;font-family:var(--mono)}
+.holdcell label{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2);cursor:pointer}
+.holdcell input{accent-color:var(--warning);margin:0}
+tr.held td{background:var(--sunken)}
+tr.held .acct{color:var(--ink2)}
+.tlink{font-family:var(--mono);font-size:11.5px;white-space:nowrap}
+
+.empty{margin-top:16px;padding:28px 18px;background:var(--surface);border:1px dashed var(--rule);
+  border-radius:3px;color:var(--ink2);font-size:13.5px;text-align:center}
+.empty b{display:block;color:var(--ink);font-size:14.5px;font-weight:600;margin-bottom:5px}
+.hidden{display:none}
+footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--grid);color:var(--muted);font-size:12px}
+footer p{margin:0 0 7px;max-width:80ch}
+.tip{position:fixed;z-index:9;pointer-events:none;background:var(--ink);color:var(--page);
+  font-size:12px;padding:5px 8px;border-radius:3px;white-space:nowrap;opacity:0;transition:opacity .1s}
+.tip.on{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">V Digital Services &middot; Agency Operations</div>
+    <h1>Strategy Renewal Status</h1>
+    <p class="lede">Every strategy renewal and Month&nbsp;0 build in the current cycle, straight from Teamwork.
+      Strategies need client approval by the <b>20th of their Month&nbsp;1</b> for deliverables to be
+      implemented that month.</p>
+    <p class="stamp" id="stamp">Connecting to the renewal store&hellip;</p>
+  </header>
+
+  <section class="band" id="band" hidden>
+    <div>
+      <div class="hero" id="heroVal">&mdash;</div>
+      <div class="heroLabel" id="heroLab">awaiting approval</div>
+    </div>
+    <div class="cd">
+      <div class="cdNum" id="cdNum">&mdash;</div>
+      <div class="cdLab" id="cdLab">to deadline</div>
+    </div>
+  </section>
+
+  <div class="empty" id="loading">
+    <b>Loading the current cycle</b>
+    Pulling renewal and Month&nbsp;0 records from the Teamwork store. Status, owner and approval
+    deadline for every account will appear here.
+  </div>
+
+  <div id="main" hidden>
+    <h2 id="h2tiles">Where the cycle stands</h2>
+    <div class="tiles" id="tiles"></div>
+
+    <h2>Load by partner<span class="n" id="chartN"></span></h2>
+    <p class="note">Each bar is one partner's accounts for the current month, segmented by status.
+      The widest warning band is where approval chasing pays off most.</p>
+    <div class="chart">
+      <div class="legend" id="legend"></div>
+      <div id="prows"></div>
+    </div>
+
+    <h2>Needs an approval push<span class="n" id="chaseN"></span></h2>
+    <p class="note">Delivered to the client or rep and waiting on sign-off. These are the accounts a
+      manager can move today.</p>
+    <div class="scroll" id="chaseWrap"><table>
+      <thead><tr><th>Account</th><th>Partner</th><th>CSM</th><th>Stage</th><th>Deadline</th><th>Note</th><th>Hold</th><th></th></tr></thead>
+      <tbody id="chaseBody"></tbody>
+    </table></div>
+
+    <h2>Full current-month roster<span class="n" id="rosterN"></span></h2>
+    <div class="filters">
+      <select id="fPartner" aria-label="Filter by partner"></select>
+      <select id="fCsm" aria-label="Filter by CSM"></select>
+      <select id="fStatus" aria-label="Filter by status"></select>
+      <select id="fKind" aria-label="Filter by record type">
+        <option value="">Renewals and Month 0</option>
+        <option value="Renewal">Renewals only</option>
+        <option value="Month 0">Month 0 only</option>
+      </select>
+      <input type="search" id="fText" placeholder="Search account, person or order #" aria-label="Search">
+      <label class="chk"><input type="checkbox" id="fOpen"> Not yet approved</label>
+    </div>
+    <div class="scroll tall"><table>
+      <thead><tr><th>Account</th><th>Partner</th><th>Product</th><th>CSM</th><th>Assigned to</th><th>Stage</th><th>Deadline</th><th>Note</th><th>Hold</th><th></th></tr></thead>
+      <tbody id="rosterBody"></tbody>
+    </table></div>
+    <p class="note" id="rosterEmpty" hidden>No accounts match these filters.</p>
+
+    <h2 id="h2next">In production for next month<span class="n" id="nextN"></span></h2>
+    <p class="note" id="nextNote"></p>
+    <div class="chart"><div id="nextRows"></div></div>
+  </div>
+
+  <footer>
+    <p id="srcNote"></p>
+    <p>The Stage column is the task's actual Teamwork workflow stage. Its colour groups those stages into
+      the five bands used by the tiles and the partner bars: Deliverables is not started; In Progress,
+      QA Ready, Ready For Review, Needs Edits and Edits Ready For Review are with fulfilment;
+      With Client/Rep and Edits With Client/Rep are awaiting client approval; Approved, Implemented,
+      Post as Draft and the client-implementation stages are approved. No stage set means the task sits
+      outside the standard workflow and needs a look in Teamwork.</p>
+    <p>CSM is the Teamwork project owner. Assigned to is whoever holds the task itself, usually the
+      SEO specialist or a team queue.</p>
+    <p>Notes and holds are entered here, not in Teamwork, and are shared with everyone who can open this page.</p>
+  </footer>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+(function(){
+  "use strict";
+  var ORDER=["Not Started","With Fulfilment","Awaiting Client Approval","Approved","No Stage"];
+  var HUE={"Not Started":"var(--critical)","With Fulfilment":"var(--serious)",
+           "Awaiting Client Approval":"var(--warning)","Approved":"var(--good)","No Stage":"var(--none)"};
+  var rows=[], notes={}, meta={}, canWrite=null, uid=null, prof={};
+  var $=function(id){return document.getElementById(id)};
+  var esc=function(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})};
+
+  /* ---------- date helpers (UTC-safe, no timezone drift) ---------- */
+  function dnum(s){ if(!s) return null; var p=String(s).slice(0,10).split("-");
+    if(p.length!==3) return null; return Date.UTC(+p[0],+p[1]-1,+p[2]); }
+  function today(){ var d=new Date(); return Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()); }
+  function daysUntil(s){ var a=dnum(s); if(a===null) return null;
+    return Math.round((a-today())/86400000); }
+  function fmtDate(s){ var a=dnum(s); if(a===null) return "—";
+    var d=new Date(a); return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getUTCMonth()]+" "+d.getUTCDate(); }
+
+  function primary(){ return meta.primaryMonth||"October"; }
+  function secondary(){ return meta.secondaryMonth||"November"; }
+  function cur(){ return rows.filter(function(r){return r.month===primary()}); }
+  function nxt(){ return rows.filter(function(r){return r.month===secondary()}); }
+  function openRows(list){ return list.filter(function(r){return r.status!=="Approved"}); }
+  function tally(list){ var t={}; ORDER.forEach(function(k){t[k]=0});
+    list.forEach(function(r){ if(t[r.status]===undefined)t[r.status]=0; t[r.status]++ }); return t; }
+
+  /* ---------- render ---------- */
+  function renderBand(){
+    var c=cur(), open=openRows(c).length;
+    $("heroVal").textContent=open;
+    $("heroLab").innerHTML="of "+c.length+" "+esc(primary())+" accounts not yet approved";
+    var dl=meta.approvalDeadline, d=daysUntil(dl);
+    $("cdNum").textContent = d===null ? "—" : (d<0 ? Math.abs(d)+" days past" : d===0 ? "today" : d+" days");
+    $("cdLab").textContent = d!==null && d<0 ? "since the "+fmtDate(dl)+" deadline" : "until "+fmtDate(dl);
+    $("band").hidden=false;
+  }
+  function renderTiles(){
+    var c=cur(), t=tally(c), el=$("tiles"), h="";
+    $("h2tiles").innerHTML="Where the cycle stands<span class=\"n\">"+esc(primary())+" Month 1</span>";
+    ORDER.forEach(function(k){
+      if(!t[k] && k==="No Stage") return;
+      var pct=c.length?Math.round(t[k]/c.length*100):0;
+      h+='<div class="tile"><div class="lab"><span class="sw" style="background:'+HUE[k]+'"></span>'+esc(k)+
+         '</div><div class="val">'+t[k]+'</div><div class="sub">'+pct+'% of cycle</div></div>';
+    });
+    el.innerHTML=h;
+  }
+  function renderChart(){
+    var c=cur(), by={};
+    c.forEach(function(r){ (by[r.partner]=by[r.partner]||[]).push(r) });
+    var names=Object.keys(by).sort(function(a,b){return by[b].length-by[a].length});
+    var max=names.length?by[names[0]].length:1;
+    $("chartN").textContent=esc(primary())+" · "+c.length+" accounts";
+    $("legend").innerHTML=ORDER.map(function(k){
+      return '<span><span class="sw" style="background:'+HUE[k]+'"></span>'+esc(k)+'</span>'}).join("");
+    $("prows").innerHTML=names.map(function(p){
+      var t=tally(by[p]), n=by[p].length, scale=n/max*100;
+      var segs=ORDER.filter(function(k){return t[k]>0}).map(function(k){
+        return '<i style="background:'+HUE[k]+';flex:'+t[k]+' 0 0" data-t="'+esc(p)+" — "+t[k]+" "+esc(k)+'"></i>'}).join("");
+      return '<div class="prow"><div class="pname" title="'+esc(p)+'">'+esc(p)+'</div>'+
+             '<div class="pbar" style="width:'+scale.toFixed(1)+'%">'+segs+'</div>'+
+             '<div class="ptot">'+n+'</div></div>';
+    }).join("");
+  }
+  /* the mark carries the five-bucket colour; the text is the real Teamwork stage */
+  function pill(r){
+    var st=r.stage||r.status||"—";
+    return '<span class="pill" title="'+esc(r.status)+'"><span class="sw" style="background:'+
+      (HUE[r.status]||"var(--none)")+'"></span>'+esc(st)+'</span>';
+  }
+  function deadlineCell(r){
+    var d=daysUntil(r.deadline), cls = d===null?"":(d<0?"late":(d<=7?"soon":""));
+    var txt = d===null ? "—" : (d<0 ? Math.abs(d)+"d over" : d===0 ? "today" : d+"d");
+    return '<span class="num '+cls+'">'+txt+'</span><span class="sub2">'+fmtDate(r.deadline)+'</span>';
+  }
+  function noteCell(r){
+    var n=notes[r.id]||{}, v=n.note||"";
+    if(canWrite===false) return '<td class="notes">'+(v?'<div class="ro">'+esc(v)+'</div>':'<span class="sub2">—</span>')+
+      (n.by?'<div class="by">'+esc(prof[n.by]||"a teammate")+'</div>':'')+'</td>';
+    return '<td class="notes"><textarea id="n_'+esc(r.id)+'" data-id="'+esc(r.id)+
+      '" rows="1" placeholder="Add context…" aria-label="Note for '+esc(r.account)+'">'+esc(v)+'</textarea>'+
+      (n.by?'<div class="by">'+esc(prof[n.by]||"a teammate")+'</div>':'')+'</td>';
+  }
+  function holdCell(r){
+    var held=!!(notes[r.id]&&notes[r.id].hold);
+    if(canWrite===false) return '<td class="holdcell">'+(held?'<span class="pill"><span class="sw" style="background:var(--warning)"></span>Hold</span>':'<span class="sub2">—</span>')+'</td>';
+    return '<td class="holdcell"><label><input type="checkbox" id="h_'+esc(r.id)+'" data-id="'+esc(r.id)+'"'+
+      (held?" checked":"")+' aria-label="Hold '+esc(r.account)+'"> Hold</label></td>';
+  }
+  function acctCell(r){
+    return '<span class="acct">'+(r.escalated?'<span class="esc">ESCALATION</span>':"")+esc(r.account)+'</span>'+
+           '<span class="sub2">'+esc(r.kind)+(r.order?" · #"+esc(r.order):"")+'</span>';
+  }
+  function tlink(r){ return r.url?'<a class="tlink" href="'+esc(r.url)+'" target="_blank" rel="noopener">Teamwork ↗</a>':"" }
+
+  function renderChase(){
+    var list=cur().filter(function(r){return r.status==="Awaiting Client Approval"})
+      .sort(function(a,b){return (dnum(a.deadline)||0)-(dnum(b.deadline)||0) || a.account.localeCompare(b.account)});
+    $("chaseN").textContent=list.length+" accounts";
+    $("chaseBody").innerHTML=list.length?list.map(function(r){
+      return '<tr class="'+(notes[r.id]&&notes[r.id].hold?"held":"")+'"><td>'+acctCell(r)+'</td><td>'+esc(r.partner)+
+        '</td><td>'+esc(r.csm||"—")+'</td><td>'+pill(r)+'</td><td>'+deadlineCell(r)+'</td>'+noteCell(r)+holdCell(r)+
+        '<td>'+tlink(r)+'</td></tr>'}).join("")
+      :'<tr><td colspan="8" style="color:var(--muted)">Nothing is waiting on a client right now.</td></tr>';
+  }
+  function fillSelects(){
+    var sp=$("fPartner"); if(sp.options.length>1) return;
+    var ps=Array.from(new Set(rows.map(function(r){return r.partner}))).sort();
+    sp.innerHTML='<option value="">All partners</option>'+ps.map(function(p){
+      return '<option value="'+esc(p)+'">'+esc(p)+'</option>'}).join("");
+    var cs=Array.from(new Set(rows.map(function(r){return r.csm}).filter(Boolean))).sort();
+    $("fCsm").innerHTML='<option value="">All CSMs</option>'+cs.map(function(c){
+      return '<option value="'+esc(c)+'">'+esc(c)+'</option>'}).join("");
+    $("fStatus").innerHTML='<option value="">All statuses</option>'+ORDER.map(function(s){
+      return '<option value="'+esc(s)+'">'+esc(s)+'</option>'}).join("");
+  }
+  function renderRoster(){
+    var p=$("fPartner").value, s=$("fStatus").value, k=$("fKind").value, c=$("fCsm").value,
+        q=$("fText").value.trim().toLowerCase(), only=$("fOpen").checked;
+    var list=cur().filter(function(r){
+      if(p&&r.partner!==p) return false;
+      if(c&&r.csm!==c) return false;
+      if(s&&r.status!==s) return false;
+      if(k&&r.kind!==k) return false;
+      if(only&&r.status==="Approved") return false;
+      if(q){ var hay=(r.account+" "+r.csm+" "+r.specialist+" "+r.order+" "+r.product+" "+r.stage).toLowerCase();
+             if(hay.indexOf(q)<0) return false }
+      return true;
+    }).sort(function(a,b){
+      return ORDER.indexOf(a.status)-ORDER.indexOf(b.status) || a.partner.localeCompare(b.partner)
+          || a.account.localeCompare(b.account)});
+    $("rosterN").textContent=list.length+" of "+cur().length;
+    $("rosterEmpty").hidden=!!list.length;
+    $("rosterBody").innerHTML=list.map(function(r){
+      return '<tr class="'+(notes[r.id]&&notes[r.id].hold?"held":"")+'"><td>'+acctCell(r)+'</td><td>'+esc(r.partner)+
+        '</td><td><span class="sub2" style="margin:0">'+esc(r.product||"—")+'</span></td><td>'+esc(r.csm||"—")+
+        '</td><td>'+esc(r.specialist)+'</td><td>'+pill(r)+'</td><td>'+deadlineCell(r)+'</td>'+noteCell(r)+holdCell(r)+
+        '<td>'+tlink(r)+'</td></tr>'}).join("");
+  }
+  function renderNext(){
+    var n=nxt(), by={};
+    n.forEach(function(r){ (by[r.partner]=by[r.partner]||[]).push(r) });
+    var names=Object.keys(by).sort(function(a,b){return by[b].length-by[a].length});
+    var max=names.length?by[names[0]].length:1;
+    $("h2next").innerHTML="In production for next month<span class=\"n\">"+esc(secondary())+" Month 1 · "+n.length+" accounts</span>";
+    var t=tally(n);
+    $("nextNote").innerHTML=n.length+" accounts carry a "+esc(secondary())+
+      " Month 1 tag, with approval due "+esc(fmtDate((meta.nextDeadline)||""))+
+      ". "+t["Approved"]+" already approved, "+(n.length-t["Approved"])+" still in flight.";
+    $("nextRows").innerHTML=names.map(function(p){
+      var tt=tally(by[p]), c=by[p].length, scale=c/max*100;
+      var segs=ORDER.filter(function(k){return tt[k]>0}).map(function(k){
+        return '<i style="background:'+HUE[k]+';flex:'+tt[k]+' 0 0" data-t="'+esc(p)+" — "+tt[k]+" "+esc(k)+'"></i>'}).join("");
+      return '<div class="prow"><div class="pname" title="'+esc(p)+'">'+esc(p)+'</div>'+
+             '<div class="pbar" style="width:'+scale.toFixed(1)+'%">'+segs+'</div>'+
+             '<div class="ptot">'+c+'</div></div>';
+    }).join("");
+  }
+  function renderAll(){
+    if(!rows.length) return;
+    $("loading").hidden=true; $("main").hidden=false;
+    fillSelects(); renderBand(); renderTiles(); renderChart();
+    renderChase(); renderRoster();
+    try{ renderNext() }catch(err){ $("h2next").hidden=true; $("nextNote").hidden=true }
+    var when=meta.refreshedAt?new Date(meta.refreshedAt):null;
+    $("stamp").innerHTML="<b>"+rows.length+" records</b> · last refreshed from Teamwork "+
+      (when&&!isNaN(when)?esc(when.toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})):"—")+
+      (canWrite===false?" · read-only view":"");
+    $("srcNote").textContent=meta.source||"";
+  }
+
+  /* ---------- tooltip for chart segments ---------- */
+  var tip=$("tip");
+  document.addEventListener("mouseover",function(e){
+    var i=e.target.closest&&e.target.closest(".pbar i"); if(!i)return;
+    tip.textContent=i.getAttribute("data-t")||""; tip.classList.add("on");
+  });
+  document.addEventListener("mousemove",function(e){
+    if(!tip.classList.contains("on"))return;
+    var x=Math.min(e.clientX+12,window.innerWidth-tip.offsetWidth-8);
+    tip.style.left=Math.max(8,x)+"px"; tip.style.top=(e.clientY+16)+"px";
+  });
+  document.addEventListener("mouseout",function(e){
+    if(e.target.closest&&e.target.closest(".pbar i")) tip.classList.remove("on");
+  });
+
+  /* ---------- filters (per-viewer memory only) ---------- */
+  var FK="vds_renewal_filters";
+  function saveF(){ try{ localStorage.setItem(FK,JSON.stringify({
+      p:$("fPartner").value,c:$("fCsm").value,s:$("fStatus").value,
+      k:$("fKind").value,o:$("fOpen").checked})) }catch(_){} }
+  function loadF(){ try{ var v=JSON.parse(localStorage.getItem(FK)||"{}");
+      if(v.p)$("fPartner").value=v.p; if(v.c)$("fCsm").value=v.c; if(v.s)$("fStatus").value=v.s;
+      if(v.k)$("fKind").value=v.k; if(v.o)$("fOpen").checked=true }catch(_){} }
+  ["fPartner","fCsm","fStatus","fKind","fOpen"].forEach(function(id){
+    $(id).addEventListener("change",function(){saveF();renderRoster()}) });
+  $("fText").addEventListener("input",function(){renderRoster()});
+
+  /* ---------- store ---------- */
+  var db=null, timers={};
+  function writeNote(id,patch){
+    if(!db||canWrite===false) return;
+    var cur=notes[id]||{};
+    var body={note:cur.note||"",hold:!!cur.hold,by:uid||"",at:new Date().toISOString()};
+    for(var k in patch) body[k]=patch[k];
+    notes[id]=body;
+    db.collection("annotations").doc(String(id)).set(body).catch(function(err){
+      if(err&&err.code==="invalid_argument"){ canWrite=false; renderAll() }
+    });
+  }
+  document.addEventListener("input",function(e){
+    var ta=e.target; if(!ta.dataset||!ta.dataset.id||ta.tagName!=="TEXTAREA")return;
+    var id=ta.dataset.id, v=ta.value;
+    clearTimeout(timers[id]);
+    timers[id]=setTimeout(function(){ writeNote(id,{note:v}) },700);
+  });
+  document.addEventListener("change",function(e){
+    var cb=e.target; if(!cb.dataset||!cb.dataset.id||cb.type!=="checkbox")return;
+    writeNote(cb.dataset.id,{hold:cb.checked});
+    var tr=cb.closest("tr"); if(tr)tr.classList.toggle("held",cb.checked);
+  });
+
+  function boot(){
+    if(!window.claude||!window.claude.use){
+      $("loading").innerHTML='<b>Renewal store unavailable</b>This page reads its records from the artifact store, which this view cannot reach.';
+      return;
+    }
+    Promise.all([claude.use("db"),claude.use("user")]).then(function(r){
+      db=r[0];
+      var user=r[1];
+      var claudeUser=(user&&user.profiles)?user:null;
+      function paintNotes(){
+        renderChase();
+        if(!(document.activeElement&&document.activeElement.tagName==="TEXTAREA")) renderRoster();
+      }
+      if(!db){
+        $("loading").innerHTML='<b>Renewal store unavailable</b>Sign in with your V Digital Services account to load the current cycle.';
+        return;
+      }
+      if(user){
+        Promise.resolve(user.can&&user.can("data.write")).then(function(w){
+          if(w===false){canWrite=false;renderAll()} else if(w===true){canWrite=true}
+        }).catch(function(){});
+        Promise.resolve(user.id&&user.id()).then(function(i){uid=i||null}).catch(function(){});
+      }
+      db.doc("meta/refresh").get().then(function(s){
+        if(s.exists) meta=s.data()||{};
+      }).catch(function(){}).then(function(){
+        db.collection("renewals").get().then(function(q){
+          rows=[];
+          q.docs.forEach(function(d){
+            var o=d.data()||{};
+            if(Array.isArray(o.rows)) rows=rows.concat(o.rows);
+          });
+          rows=rows.filter(function(o){return o&&o.account&&o.id});
+          if(!rows.length){
+            $("loading").innerHTML='<b>No records yet</b>The current cycle has not been loaded into this page’s store.';
+            return;
+          }
+          loadF(); renderAll();
+          db.collection("annotations").onSnapshot(function(qs){
+            notes={}; qs.docs.forEach(function(d){ notes[d.id]=d.data()||{} });
+            var ids=Object.keys(notes).map(function(k){return notes[k].by}).filter(Boolean);
+            if(claudeUser&&ids.length){
+              claudeUser.profiles(Array.from(new Set(ids))).then(function(ps){
+                Object.keys(ps||{}).forEach(function(k){ prof[k]=(ps[k]&&ps[k].name)||"" });
+                paintNotes();
+              }).catch(function(){paintNotes()});
+            } else paintNotes();
+          },function(){});
+        }).catch(function(){
+          $("loading").innerHTML='<b>Could not load the cycle</b>The renewal store did not answer. Reload in a moment.';
+        });
+      });
+    }).catch(function(){
+      $("loading").innerHTML='<b>Renewal store unavailable</b>This view could not initialise the artifact store.';
+    });
+  }
+  boot();
+})();
+</script>
+
+</body></html>
